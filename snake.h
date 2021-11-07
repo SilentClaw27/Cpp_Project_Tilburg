@@ -1,3 +1,4 @@
+#include "std_lib_facilities.h"
 #ifndef GUITEST_SNAKE_H
 #define GUITEST_SNAKE_H
 
@@ -13,11 +14,12 @@ private:
     char symbol = '*';
 
 public:
-    //Basic Constructor Creating the Starting position of the snake
-    Snake(int l,int h,int dir){
+    //Basic Constructors Creating the Starting position of the snake
+    Snake(int l,int h){
         this->location_x_pos = rand() % l;
         this->location_y_pos = rand() % h;
-        this->direction = dir;
+        this->direction =0;
+        this->setFirstDir();
         this->nextS = NULL;
     }
 
@@ -29,6 +31,13 @@ public:
         this->symbol = sym;
     }
 
+    Snake(int pos_x,int pos_y,int dir,Snake *s,char sym){
+        this->location_x_pos = pos_x;
+        this->location_y_pos = pos_y;
+        this->direction = dir;
+        this->symbol = sym;
+        this->nextS = s;
+    }
     Snake(){
         this->location_x_pos = 0;
         this->location_y_pos = 0;
@@ -46,12 +55,13 @@ public:
     void setPos_X(int pos_x);
     void setPos_Y(int pos_y);
     void setDir(int dir);
-    //void setFirstDir();
+    void setFirstDir();
+    void setNext(Snake *s);
     void setSnake(int x,int y,int dir);
-
-
-
-
+    void movement();
+    void steer();
+    void grow_Snake(Fruit f);
+    bool checkEat(Fruit f);
 };
 
 int Snake::getPos_X() {
@@ -84,6 +94,32 @@ void Snake::setPos_Y(int pos_y) {
 
 void Snake:: setDir(int dir) {
     this->direction = dir;
+}
+
+void Snake:: setNext(Snake* s){
+    this->nextS = s;
+}
+void Snake::setFirstDir() {
+    int dir = rand() % 4;;
+
+    switch(dir){
+        case 0:{
+            this->setDir(0);
+            break;
+        }
+        case 1:{
+            this->setDir(90);
+            break;
+        }
+        case 2:{
+            this->setDir(180);
+            break;
+        }
+        case 3:{
+            this->setDir(270);
+            break;
+        }
+    }
 }
 
 void Snake::setSnake(int x,int y, int dir){

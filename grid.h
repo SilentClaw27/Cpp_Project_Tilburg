@@ -16,6 +16,7 @@ public:
     void addConnection(int start_x, int start_y, int end_x, int end_y);
     void Algorithm(int start_x, int start_y);
     bool Location_X_Y(Snake* s, int x,int y);
+    bool checkFruit(Fruit *f, int x, int y);
 };
 
 Grid::Grid(int boxes){
@@ -91,5 +92,12 @@ bool Grid::Location_X_Y(Snake* s, int x,int y) {
     return false;
 }
 
-
+bool Grid::checkFruit(Fruit* f, int x,int y) {
+    Fruit *curr = new Fruit;
+    curr = f;
+    if ((x == curr->get_X()) && (y == curr->get_Y())) {
+        return true;
+    }
+    return false;
+}
 #endif //GUITEST_GRID_H
