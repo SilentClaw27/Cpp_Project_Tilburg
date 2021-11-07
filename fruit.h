@@ -1,0 +1,4 @@
+#ifndef GUITEST_FRUIT_H
+#define GUITEST_FRUIT_H
+
+#endif //GUITEST_FRUIT_H
