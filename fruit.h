@@ -1,4 +1,7 @@
 #include "std_lib_facilities.h"
+#include "snake.h"
+
+
 #ifndef GUITEST_FRUIT_H
 #define GUITEST_FRUIT_H
 class Fruit{
@@ -19,7 +22,10 @@ public:
 
     void set_X(int x);
     void set_Y(int y);
-    Fruit createNewFruit();
+    bool snakeClash(Snake *s);
+    Fruit createNewFruit(Snake *s);
+    void grow_Snake(Snake *s);
+    bool checkEat(Snake *s);
 
 };
 
@@ -42,16 +48,5 @@ void Fruit:: set_Y(int y){
     this->pos_y = y;
 }
 
-Fruit Fruit::createNewFruit() {
-    srand(time(NULL));
-    int x = rand() % 20;
-    int y = rand() % 20;
 
-    Fruit f;
-
-    f.set_X(x);
-    f.set_Y(y);
-
-    return f;
-}
 #endif //GUITEST_FRUIT_H

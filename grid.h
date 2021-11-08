@@ -1,71 +1,24 @@
 #include "std_lib_facilities.h"
-#include <list>
+#include "functions.h"
 
 #ifndef GUITEST_GRID_H
 #define GUITEST_GRID_H
 
 class Grid {
 private:
-    int boxes;
-    list<int>* closeBoxes_x;
-    list<int>* closeBoxes_y;
-    bool *visited;
+    int length;
+    int height;
 
 public:
-    Grid(int boxes);
-    void addConnection(int start_x, int start_y, int end_x, int end_y);
-    void Algorithm(int start_x, int start_y);
+    Grid(int length,int height);
     bool Location_X_Y(Snake* s, int x,int y);
     bool checkFruit(Fruit *f, int x, int y);
+    void drawGrid(Snake *s, Fruit *f);
 };
 
-Grid::Grid(int boxes){
-    this->boxes = boxes;
-    this->closeBoxes_x = new list<int>[boxes];
-    this->closeBoxes_y = new list<int>[boxes];
-}
-
-void Grid::addConnection(int start_x, int start_y, int end_x, int end_y){
-    this->closeBoxes_x[start_x].push_back(end_x);
-    this->closeBoxes_y[start_y].push_back(end_y);
-}
-
-void Grid:: Algorithm(int start_x,int start_y){
-    bool visited[boxes][boxes];
-
-    for(int i=0;i<boxes;i++){
-        for(int j =0;j<boxes;j++){
-            visited[i][j] = false;
-        }
-    }
-
-    list<int> queue_x;
-    list<int> queue_y;
-
-    visited[start_x][start_y] = true;
-    queue_x.push_back(start_x);
-    queue_y.push_back(start_y);
-
-    list<int>::iterator i;
-    list<int>::iterator j;
-
-    while ((!queue_x.empty()) && (!queue_y.empty())) {
-        int curr_x_pos = queue_x.front();
-        int curr_y_pos = queue_y.front();
-        cout << "Visited " << curr_x_pos << " and " << curr_y_pos;
-        queue_x.pop_front();
-        queue_y.pop_front();
-
-        for (i = closeBoxes_x[curr_x_pos].begin(), j = closeBoxes_y[curr_y_pos].begin(); i != closeBoxes_x[curr_x_pos].end() && j != closeBoxes_y[curr_y_pos].end(); ++i,++j) {
-            int adjVertex_x = *i;
-            int adjVertex_y = *j;
-            if (!visited[adjVertex_x][adjVertex_y]) {
-                visited[adjVertex_x][adjVertex_y] = true;
-                queue_x.push_back(adjVertex_x);
-                queue_y.push_back(adjVertex_y);
-            }
-        }
-    }
+Grid::Grid(int length,int height){
+    this->length = length;
+    this->height = height;
 }
 
 bool Grid::Location_X_Y(Snake* s, int x,int y) {
@@ -99,5 +52,26 @@ bool Grid::checkFruit(Fruit* f, int x,int y) {
         return true;
     }
     return false;
+}
+
+void Grid::drawGrid(Snake *s, Fruit *f){
+    bool x = false;
+    bool y = false;
+
+    for (int i = 0; i < height; i++) {
+        for (int j = 0; j < length; j++) {
+            x = this->Location_X_Y(s, j, i);
+            y = this->checkFruit(f, j, i);
+            if ((x)) {
+                cout << s->getSym();
+            } else if (y) {
+                cout << f->getSymbol();
+            } else {
+                cout << "#";
+            }
+        }
+
+        cout << endl;
+    }
 }
 #endif //GUITEST_GRID_H

@@ -1,6 +1,5 @@
 #include "fruit.h"
 #include "snake.h"
-#include "grid.h"
 
 void gameOver();
 #ifndef GUITEST_FUNCTIONS_H
@@ -59,34 +58,36 @@ void Snake:: movement(){
             break;
         }
     }
-    a = this;
-    int new_dir;
-    int count = 0;
-    int old_x,old_y;
-    int new_x = start_x;
-    int new_y = start_y;
-    do{
-        old_x = new_x;
-        old_y = new_y;
+    if(this->getNextSnake() != NULL) {
+        a = this;
+        int new_dir;
+        int count = 0;
+        int old_x, old_y;
+        int new_x = start_x;
+        int new_y = start_y;
+        do {
+            old_x = new_x;
+            old_y = new_y;
 
-        a = a->getNextSnake();
-        new_x = a->getPos_X();
-        new_y = a->getPos_Y();
-        if(count != 0) {
-            a->setDir(new_dir);
-        }
+            a = a->getNextSnake();
+            new_x = a->getPos_X();
+            new_y = a->getPos_Y();
+            if (count != 0) {
+                a->setDir(new_dir);
+            }
 
 
-        a->setPos_X(old_x);
-        a->setPos_Y(old_y);
-        if(a->getNextSnake() != NULL){
-            new_dir = a->getDir();
-        }
+            a->setPos_X(old_x);
+            a->setPos_Y(old_y);
+            if (a->getNextSnake() != NULL) {
+                new_dir = a->getDir();
+            }
 
-        if(count ==0){
-            count++;
-        }
-    }while(a->getNextSnake() != NULL);
+            if (count == 0) {
+                count++;
+            }
+        } while (a->getNextSnake() != NULL);
+    }
 
 //    do{
 //
@@ -128,8 +129,8 @@ void gameOver(){
     exit(2);
 }
 
-bool Snake:: checkEat(Fruit f){
-    if((this->getPos_X() == f.get_X()) && (this->getPos_Y() == f.get_Y())){
+bool Fruit:: checkEat(Snake *s){
+    if((s->getPos_X() == this->get_X()) && (s->getPos_Y() == this->get_Y())){
         return true;
     }
     else{
@@ -137,14 +138,48 @@ bool Snake:: checkEat(Fruit f){
     }
 }
 
-void Snake:: grow_Snake(Fruit f){
-    Snake *s = new Snake;
-    s->setPos_X(this->getPos_X());
-    s->setPos_Y(this->getPos_Y());
-    s->setNext(this->getNextSnake());
+void Fruit:: grow_Snake(Snake *s){
+    Snake *temp = new Snake;
+    temp->setPos_X(s->getPos_X());
+    temp->setPos_Y(s->getPos_Y());
+    temp->setNext(s->getNextSnake());
 
-    this->nextS = s;
-    this->setPos_X(f.get_X());
-    this->setPos_Y(f.get_Y());
+    s->setNext(temp);
+    s->setPos_X(this->get_X());
+    s->setPos_Y(this->get_Y());
+}
+
+Fruit Fruit::createNewFruit(Snake *s) {
+    bool correct = true;
+    int x =0;
+    int y= 0;
+    Fruit f;
+    srand(time(NULL));
+    do {
+        x = rand() % 20;
+        y = rand() % 20;
+
+        f.set_X(x);
+        f.set_Y(y);
+
+        correct = f.snakeClash(s);
+    }while(!correct);
+    return f;
+}
+
+bool Fruit::snakeClash(Snake *s){
+    Snake *temp = new Snake;
+    temp = s;
+
+    if(this->checkEat(s)){
+        return false;
+    }
+    while(temp->getNextSnake() != NULL){
+        temp = temp->getNextSnake();
+        if(this->checkEat(temp)){
+            return false;
+        }
+    }
+    return true;
 }
 #endif //GUITEST_FUNCTIONS_H

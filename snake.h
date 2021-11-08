@@ -1,4 +1,5 @@
 #include "std_lib_facilities.h"
+
 #ifndef GUITEST_SNAKE_H
 #define GUITEST_SNAKE_H
 
@@ -60,8 +61,6 @@ public:
     void setSnake(int x,int y,int dir);
     void movement();
     void steer();
-    void grow_Snake(Fruit f);
-    bool checkEat(Fruit f);
 };
 
 int Snake::getPos_X() {
