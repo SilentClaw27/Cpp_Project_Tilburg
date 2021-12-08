@@ -1,9 +1,19 @@
-#include "std_lib_facilities.h"
+#include <stdlib.h>
+#include <time.h>
+#include <winsock2.h>
+#include <QtCore>
+#include <QDebug>
+#include <QApplication>
+#include <QGraphicsScene>
+#include <QGraphicsRectItem>
+#include <QGraphicsView>
+#include <QKeyEvent>
+#include <vector>
 
 #ifndef GUITEST_SNAKE_H
 #define GUITEST_SNAKE_H
 
-class Snake{
+class Snake: public QGraphicsRectItem{
 private:
     int length = 1;
     int direction = 0;
@@ -12,95 +22,110 @@ private:
     int location_x_pos = 0;
     int location_y_pos = 0;
     Snake *nextS;
-    char symbol = '*';
 
 public:
     //Basic Constructors Creating the Starting position of the snake
-    Snake(int l,int h){
-        this->location_x_pos = rand() % l;
-        this->location_y_pos = rand() % h;
-        this->direction =0;
-        this->setFirstDir();
-        this->nextS = NULL;
-    }
+    Snake();
+    Snake(int pos_x,int pos_y,int dir);
+    Snake(int pos_x,int pos_y,int dir,Snake *s);
 
-    Snake(int pos_x,int pos_y,int dir,char sym){
-        this->location_x_pos = pos_x;
-        this->location_y_pos = pos_y;
-        this->direction = dir;
-        this->nextS = NULL;
-        this->symbol = sym;
-    }
-
-    Snake(int pos_x,int pos_y,int dir,Snake *s,char sym){
-        this->location_x_pos = pos_x;
-        this->location_y_pos = pos_y;
-        this->direction = dir;
-        this->symbol = sym;
-        this->nextS = s;
-    }
-    Snake(){
-        this->location_x_pos = 0;
-        this->location_y_pos = 0;
-        this->direction = 0;
-        this->nextS = NULL;
-        this->symbol = '*';
-    }
     //Getters and Setters of Attributes
     int getPos_X();
     int getPos_Y();
     int getDir();
     Snake* getNextSnake();
-    char getSym();
+    int getLength();
 
+    void setLength();
     void setPos_X(int pos_x);
     void setPos_Y(int pos_y);
     void setDir(int dir);
     void setFirstDir();
     void setNext(Snake *s);
     void setSnake(int x,int y,int dir);
-    void movement();
-    void steer();
+
+    //Functions
+    void keyPressEvent(QKeyEvent *event);
 };
 
-int Snake::getPos_X() {
+//Constructor used when the Program is started i.e. used when the snake head is created
+inline Snake::Snake(){
+    this->location_x_pos = (rand() % 20);
+    this->location_y_pos = (rand() % 20);
+    this->direction = 0;
+    this->setFirstDir();
+    this->nextS = NULL;
+}
+
+//Constructor to create a new body for the snake after eating the fruit
+inline Snake::Snake(int pos_x,int pos_y,int dir){
+    this->location_x_pos = pos_x;
+    this->location_y_pos = pos_y;
+    this->direction = dir;
+    this->nextS = NULL;
+}
+
+//Constructor to add the new body to the snake
+inline Snake::Snake(int pos_x,int pos_y,int dir,Snake *s){
+    this->location_x_pos = pos_x;
+    this->location_y_pos = pos_y;
+    this->direction = dir;
+    this->nextS = s;
+}
+
+//Getting the X Position of the Snake Body which is used
+inline int Snake::getPos_X() {
     return this->location_x_pos;
 }
 
-int Snake::getPos_Y() {
+//Getting the Y Position of the Snake Body which is used
+inline int Snake::getPos_Y() {
     return this->location_y_pos;
 }
 
-int Snake:: getDir() {
+//Getting the Direction of the Snake Body
+inline int Snake:: getDir() {
     return this->direction;
 }
 
-Snake* Snake:: getNextSnake(){
+//Getting the next piece of the snake
+inline Snake* Snake:: getNextSnake(){
     return this->nextS;
 }
 
-char Snake::getSym(){
-    return this->symbol;
+//Getting the Length of the snake
+inline int Snake::getLength(){
+    return this->length;
 }
 
-void Snake::setPos_X(int pos_x) {
+//Setting the new X Position of the Snake Body being used
+inline void Snake::setPos_X(int pos_x) {
     this->location_x_pos = pos_x;
 }
 
-void Snake::setPos_Y(int pos_y) {
+//Setting the new Y Position of the Snake Body being used
+inline void Snake::setPos_Y(int pos_y) {
     this->location_y_pos = pos_y;
 }
 
-void Snake:: setDir(int dir) {
+//Setting the new Direction of the snake
+inline void Snake:: setDir(int dir) {
     this->direction = dir;
 }
 
-void Snake:: setNext(Snake* s){
+//Setting the next piece of the snake
+inline void Snake:: setNext(Snake* s){
     this->nextS = s;
 }
-void Snake::setFirstDir() {
+
+//Setting the first direction of the snake when it is created
+inline void Snake::setFirstDir() {
     int dir = rand() % 4;;
 
+    //0 - North (0 degress)
+    //1 - East (90 degrees)
+    //2 - South (180 degrees)
+    //3 - West (270 degrees)
     switch(dir){
         case 0:{
             this->setDir(0);
@@ -121,8 +146,64 @@ void Snake::setFirstDir() {
     }
 }
 
-void Snake::setSnake(int x,int y, int dir){
-    this->nextS = new Snake(x,y,dir,this->symbol);
+//Incrementing the length of the snake when a piece of fruit is eaten
+inline void Snake::setLength(){
+    this->length = this->length + 1;
 }
 
+//Creating a new piece of snake body
+inline void Snake::setSnake(int x,int y, int dir){
+    this->nextS = new Snake(x,y,dir);
+}
+
+//Taking in the event of the user using the arrow keys to change the snake's direction
+inline void Snake:: keyPressEvent(QKeyEvent *event){
+    int dir = this->getDir();
+
+    //Depending on the Direction, the user can only go left and right of said direction
+       if(dir == 0){
+           if(event->key() == Qt::Key_Left) {
+               this->setDir(270);
+           }
+           else if(event->key() == Qt::Key_Right) {
+               this->setDir(90);
+           }
+           else{
+               return;
+           }
+       }
+       else if(dir == 90){
+           if(event->key() == Qt::Key_Up) {
+               this->setDir(0);
+           }
+           else if(event->key() == Qt::Key_Down) {
+               this->setDir(180);
+           }
+           else{
+               return;
+           }
+       }
+       else if(dir == 180){
+           if(event->key() == Qt::Key_Left) {
+               this->setDir(270);
+           }
+           else if(event->key() == Qt::Key_Right) {
+               this->setDir(90);
+           }
+           else{
+               return;
+           }
+       }
+       else if(dir == 270){
+           if(event->key() == Qt::Key_Up) {
+               this->setDir(0);
+           }
+           else if(event->key() == Qt::Key_Down) {
+               this->setDir(180);
+           }
+           else{
+               return;
+           }
+       }
+}
 #endif //GUITEST_SNAKE_H
